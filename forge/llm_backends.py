@@ -16,6 +16,7 @@ class ToolCall:
     id: str
     name: str
     input: dict
+    extra: dict = field(default_factory=dict)   # provider-specific data that must be echoed back
 
 
 @dataclass
@@ -28,8 +29,11 @@ class LLMResponse:
 
     def as_assistant_blocks(self) -> list:
         blocks = [{"type": "text", "text": self.text}] if self.text else []
-        blocks += [{"type": "tool_use", "id": tc.id, "name": tc.name, "input": tc.input}
-                   for tc in self.tool_calls]
+        for tc in self.tool_calls:
+            b = {"type": "tool_use", "id": tc.id, "name": tc.name, "input": tc.input}
+            if tc.extra:
+                b["_provider_extra"] = tc.extra
+            blocks.append(b)
         return blocks
 
 
@@ -78,7 +82,8 @@ class OpenAICompatBackend:
             elif m["role"] == "assistant":
                 text = "".join(b["text"] for b in m["content"] if b["type"] == "text")
                 calls = [{"id": b["id"], "type": "function",
-                          "function": {"name": b["name"], "arguments": json.dumps(b["input"])}}
+                          "function": {"name": b["name"], "arguments": json.dumps(b["input"])},
+                          **b.get("_provider_extra", {})}     # e.g. Gemini thought signatures
                          for b in m["content"] if b["type"] == "tool_use"]
                 msg = {"role": "assistant", "content": text or None}
                 if calls:
@@ -97,10 +102,13 @@ class OpenAICompatBackend:
 
     def complete(self, system, messages, tools, max_tokens) -> LLMResponse:
         msgs, fns = self.to_openai(system, messages, tools)
+        extra = {}
+        if os.getenv("OPENAI_COMPAT_REASONING_EFFORT"):
+            extra["reasoning_effort"] = os.getenv("OPENAI_COMPAT_REASONING_EFFORT")
         try:
             r = self.client.chat.completions.create(model=self.model, messages=msgs, tools=fns,
                                                     tool_choice="auto", temperature=0,
-                                                    max_tokens=max_tokens)
+                                                    max_tokens=max_tokens, **extra)
         except (self._openai.RateLimitError, self._openai.InternalServerError,
                 self._openai.APIConnectionError) as e:
             raise RetryableError(str(e)) from e
@@ -111,7 +119,9 @@ class OpenAICompatBackend:
                 args = json.loads(tc.function.arguments or "{}")
             except json.JSONDecodeError:
                 args = {"_unparseable_arguments": tc.function.arguments}
-            calls.append(ToolCall(tc.id or f"call_{i}", tc.function.name, args))
+            keep = {k: v for k, v in (getattr(tc, "model_extra", None) or {}).items()
+                    if k == "extra_content"}
+            calls.append(ToolCall(tc.id or f"call_{i}", tc.function.name, args, keep))
         usage = r.usage
         return LLMResponse(choice.message.content or "", calls,
                            getattr(usage, "prompt_tokens", 0) or 0,

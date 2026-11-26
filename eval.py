@@ -113,7 +113,9 @@ def main(argv=None) -> int:
           + "".join(f"\n   - {d['document_id']}: {d['tool']} ({d['reason']})" for d in denials))
     print(f"Fail-closed / system flags: {sum(1 for r in results.values() if r['decided_by'] == 'system')}")
     print(f"Model calls / tokens      : {len(run_calls) if not args.all_logs else sum(1 for c in calls if c.get('run_id') == run_id)} / {tokens}")
-    print(f"Total LLM cost            : ${total_cost:.5f}")
+    print(f"Total LLM cost            : ${total_cost:.5f}"
+          + ("" if all(c.get("price_configured", True) for c in calls if c.get("run_id") == run_id)
+             else "   (model not in config/pricing.yaml - priced at pessimistic default)"))
     print(f"PHI leak scan             : {len(run_calls)} model requests+responses scanned "
           f"against {sum(len(l['phi']) for l in labels)} PHI values (+ date variants)")
     print(f"PHI LEAKS (model)         : {len(model_leaks)}   {'<-- target is 0' if model_leaks else '(target 0)'}")

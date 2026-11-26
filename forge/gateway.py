@@ -59,6 +59,7 @@ class ModelGateway:
             self.model = MockBackend.model
         self.backend = backend or make_backend(self.provider, self.model)
         prices = load_prices()
+        self.price_configured = self.model in prices["models"]
         self.price = prices["models"].get(self.model, prices["default"])
         self.phi_values = [v.lower() for v in phi_values if len(v) >= 3]
         self.steps = 0
@@ -126,6 +127,7 @@ class ModelGateway:
                          "stop_reason": resp.stop_reason},
             "usage": {"input_tokens": resp.input_tokens, "output_tokens": resp.output_tokens},
             "cost_usd": round(cost, 6), "latency_ms": latency_ms,
+            "price_configured": self.price_configured,
         })
         audit("model_call", **self._ids(), step=self.steps, provider=self.provider,
               model=self.model, input_tokens=resp.input_tokens, output_tokens=resp.output_tokens,
