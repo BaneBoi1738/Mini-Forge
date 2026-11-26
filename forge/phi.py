@@ -130,6 +130,8 @@ def _ner_enabled() -> bool:
 def _get_analyzer():
     global _analyzer
     if _analyzer is None:
+        import logging
+        logging.getLogger("presidio-analyzer").setLevel(logging.ERROR)
         from presidio_analyzer import AnalyzerEngine
         from presidio_analyzer.nlp_engine import NlpEngineProvider
         nlp = NlpEngineProvider(nlp_configuration={

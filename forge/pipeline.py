@@ -23,10 +23,11 @@ def system_flag(executor: ToolExecutor, reason: str, category: str = "unknown"):
 
 
 def process_document(path: Path, *, run_id: str, agent: AgentSpec, policy: PolicyEngine,
-                     sops: SOPIndex, vault: Vault, provider=None, model=None) -> dict:
+                     sops: SOPIndex, vault: Vault, provider=None, model=None,
+                     correlation_id: str | None = None) -> dict:
     raw = path.read_text(encoding="utf-8", errors="replace")
     document_id = path.stem
-    correlation_id = str(uuid.uuid4())
+    correlation_id = correlation_id or str(uuid.uuid4())
     ids = dict(run_id=run_id, correlation_id=correlation_id, document_id=document_id)
     audit("document_received", **ids, sha256=hashlib.sha256(raw.encode()).hexdigest(), chars=len(raw))
 
