@@ -1,0 +1,29 @@
+# Deny by default. A tool call is allowed only if a rule below permits it.
+# 'detokenize' lists the ONLY fields that may be released (de-tokenized) for that tool's output.
+default: deny
+rules:
+  - tool: search_sop
+    effect: allow
+    detokenize: []
+  - tool: flag_for_human_review
+    effect: allow
+    detokenize: [claim_number]
+  - tool: route_to_work_queue
+    effect: allow
+    detokenize: [claim_number, date_of_service]
+  - tool: draft_appeal
+    effect: allow
+    when: {category: medical_necessity, billed_amount_max: 5000}
+    detokenize: [patient_name, member_id, claim_number, date_of_service]
+  - tool: submit_to_payer
+    effect: deny
+  - tool: write_off
+    effect: deny
+work_queues:
+  correct_and_resubmit: Billing Corrections
+  request_retro_auth: Authorization
+  timely_filing_review: Timely Filing Review
+  appeal_with_records: Appeals
+  close_no_action: Billing Corrections
+  verify_eligibility: Eligibility
+  human_review: Human Review

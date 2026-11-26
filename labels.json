@@ -1,0 +1,223 @@
+{
+  "note": "Fictional ground truth. All identifiers are fake test values (TEST-...).",
+  "labels": [
+    {
+      "document_id": "DOC-001",
+      "expected_category": "missing_or_invalid_info",
+      "expected_action": "correct_and_resubmit",
+      "expected_carc": "16",
+      "billed_amount": 420,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Alpha",
+        "date_of_birth": "1962-02-11",
+        "member_id": "TEST-MBR-0001",
+        "claim_number": "TEST-CLM-2601",
+        "date_of_service": "2026-08-14"
+      }
+    },
+    {
+      "document_id": "DOC-002",
+      "expected_category": "authorization_missing",
+      "expected_action": "request_retro_auth",
+      "expected_carc": "197",
+      "billed_amount": 1850,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Bravo",
+        "date_of_birth": "1964-03-12",
+        "member_id": "TEST-MBR-0002",
+        "claim_number": "TEST-CLM-2602",
+        "date_of_service": "2026-07-30"
+      }
+    },
+    {
+      "document_id": "DOC-003",
+      "expected_category": "timely_filing",
+      "expected_action": "timely_filing_review",
+      "expected_carc": "29",
+      "billed_amount": 640,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Charlie",
+        "date_of_birth": "1966-04-13",
+        "member_id": "TEST-MBR-0003",
+        "claim_number": "TEST-CLM-2603",
+        "date_of_service": "2026-03-02"
+      }
+    },
+    {
+      "document_id": "DOC-004",
+      "expected_category": "medical_necessity",
+      "expected_action": "appeal_with_records",
+      "expected_carc": "50",
+      "billed_amount": 2300,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "draft_appeal",
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Delta",
+        "date_of_birth": "1968-05-14",
+        "member_id": "TEST-MBR-0004",
+        "claim_number": "TEST-CLM-2604",
+        "date_of_service": "2026-08-03"
+      }
+    },
+    {
+      "document_id": "DOC-005",
+      "expected_category": "medical_necessity",
+      "expected_action": "appeal_with_records",
+      "expected_carc": "50",
+      "billed_amount": 12800,
+      "expected_human_review": true,
+      "expected_tool_calls": [
+        "flag_for_human_review"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Echo",
+        "date_of_birth": "1970-06-15",
+        "member_id": "TEST-MBR-0005",
+        "claim_number": "TEST-CLM-2605",
+        "date_of_service": "2026-07-11"
+      }
+    },
+    {
+      "document_id": "DOC-006",
+      "expected_category": "duplicate_claim",
+      "expected_action": "close_no_action",
+      "expected_carc": "18",
+      "billed_amount": 310,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Foxtrot",
+        "date_of_birth": "1972-07-16",
+        "member_id": "TEST-MBR-0006",
+        "claim_number": "TEST-CLM-2606",
+        "date_of_service": "2026-08-20"
+      }
+    },
+    {
+      "document_id": "DOC-007",
+      "expected_category": "coverage_terminated",
+      "expected_action": "verify_eligibility",
+      "expected_carc": "27",
+      "billed_amount": 760,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Golf",
+        "date_of_birth": "1974-08-17",
+        "member_id": "TEST-MBR-0007",
+        "claim_number": "TEST-CLM-2607",
+        "date_of_service": "2026-09-05"
+      }
+    },
+    {
+      "document_id": "DOC-008",
+      "expected_category": "authorization_missing",
+      "expected_action": "request_retro_auth",
+      "expected_carc": "197",
+      "billed_amount": 2150,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Hotel",
+        "date_of_birth": "1976-09-18",
+        "member_id": "TEST-MBR-0008",
+        "claim_number": "TEST-CLM-2608",
+        "date_of_service": "2026-08-28"
+      }
+    },
+    {
+      "document_id": "DOC-009",
+      "expected_category": "medical_necessity",
+      "expected_action": "appeal_with_records",
+      "expected_carc": "50",
+      "billed_amount": 980,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "draft_appeal",
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient India",
+        "date_of_birth": "1978-01-10",
+        "member_id": "TEST-MBR-0009",
+        "claim_number": "TEST-CLM-2609",
+        "date_of_service": "2026-09-12"
+      }
+    },
+    {
+      "document_id": "DOC-010",
+      "expected_category": "missing_or_invalid_info",
+      "expected_action": "correct_and_resubmit",
+      "expected_carc": "16",
+      "billed_amount": 530,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Juliet",
+        "date_of_birth": "1980-02-11",
+        "member_id": "TEST-MBR-0010",
+        "claim_number": "TEST-CLM-2610",
+        "date_of_service": "2026-09-18"
+      }
+    },
+    {
+      "document_id": "DOC-011",
+      "expected_category": "unreadable",
+      "expected_action": "human_review",
+      "expected_carc": null,
+      "billed_amount": null,
+      "expected_human_review": true,
+      "expected_tool_calls": [
+        "flag_for_human_review"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Kilo",
+        "date_of_birth": "1982-03-12",
+        "member_id": "TEST-MBR-0011",
+        "claim_number": "TEST-CLM-2611",
+        "date_of_service": "2026-09-22"
+      }
+    },
+    {
+      "document_id": "DOC-012",
+      "expected_category": "coverage_terminated",
+      "expected_action": "verify_eligibility",
+      "expected_carc": "27",
+      "billed_amount": 1120,
+      "expected_human_review": false,
+      "expected_tool_calls": [
+        "route_to_work_queue"
+      ],
+      "phi": {
+        "patient_name": "Test Patient Lima",
+        "date_of_birth": "1984-04-13",
+        "member_id": "TEST-MBR-0012",
+        "claim_number": "TEST-CLM-2612",
+        "date_of_service": "2026-09-29"
+      }
+    }
+  ]
+}

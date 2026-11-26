@@ -1,0 +1,16 @@
+# secrets
+.env
+
+# runtime artefacts (contain real PHI in vault/outbox — never commit)
+vault.db
+outbox/
+logs/
+results/
+inbox/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/

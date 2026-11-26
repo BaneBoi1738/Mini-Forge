@@ -1,0 +1,18 @@
+Crescent Care
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-03
+
+Patient: Test Patient Bravo
+Date of birth: 1964-03-12
+Member ID: TEST-MBR-0002
+Claim number: TEST-CLM-2602
+Date of service: 2026-07-30
+Billed amount: $1,850.00
+Claim adjustment reason code: 197
+
+Payment is denied because precertification / authorization was absent for the services
+billed.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

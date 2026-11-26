@@ -1,0 +1,8 @@
+# Pre-approved agent catalogue. The runner must refuse any agent not listed here.
+agents:
+  denial_triage:
+    description: Reads one payer denial letter, determines the denial category using the SOP library, and routes it.
+    allowed_tools: [search_sop, route_to_work_queue, draft_appeal, flag_for_human_review]
+    max_steps: 8
+    max_tokens_per_run: 20000
+    max_cost_usd_per_run: 0.05

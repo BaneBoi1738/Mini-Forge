@@ -1,0 +1,18 @@
+Northstar Health Plan
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-02
+
+Patient: Test Patient Alpha
+Date of birth: 1962-02-11
+Member ID: TEST-MBR-0001
+Claim number: TEST-CLM-2601
+Date of service: 2026-08-14
+Billed amount: $420.00
+Claim adjustment reason code: 16
+
+This claim is denied because it lacks information needed for adjudication. Modifier 25 was
+reported on a procedure code where it is not valid. Please correct the claim and resubmit.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

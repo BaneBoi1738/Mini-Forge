@@ -1,0 +1,18 @@
+Lakeside Medicaid Program
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-13
+
+Patient: Test Patient Lima
+Date of birth: 1984-04-13
+Member ID: TEST-MBR-0012
+Claim number: TEST-CLM-2612
+Date of service: 2026-09-29
+Billed amount: $1,120.00
+
+Our records show that Test Patient Lima, born 1984-04-13, was not an eligible member on
+the date of service because the policy ended before that date. Please verify eligibility
+and bill the correct payer.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

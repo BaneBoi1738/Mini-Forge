@@ -1,0 +1,18 @@
+Riverbend Health
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-04
+
+Patient: Test Patient Charlie
+Date of birth: 1966-04-13
+Member ID: TEST-MBR-0003
+Claim number: TEST-CLM-2603
+Date of service: 2026-03-02
+Billed amount: $640.00
+Claim adjustment reason code: 29
+
+The time limit for filing has expired. Our records show the claim was first received on
+2026-07-21, which is outside the 90-day filing limit for this plan.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.
