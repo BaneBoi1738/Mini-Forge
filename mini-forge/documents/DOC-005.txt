@@ -1,0 +1,18 @@
+Northstar Health Plan
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-06
+
+Patient: Test Patient Echo
+Date of birth: 1970-06-15
+Member ID: TEST-MBR-0005
+Claim number: TEST-CLM-2605
+Date of service: 2026-07-11
+Billed amount: $12,800.00
+Claim adjustment reason code: 50
+
+These services are denied as not medically necessary. The submitted documentation does not
+establish the need for the inpatient level of care.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

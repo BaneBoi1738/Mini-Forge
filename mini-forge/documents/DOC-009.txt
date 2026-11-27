@@ -1,0 +1,17 @@
+Summit Medicare Advantage
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-10
+
+Patient: Test Patient India
+Date of birth: 1978-01-10
+Member ID: TEST-MBR-0009
+Claim number: TEST-CLM-2609
+Date of service: 2026-09-12
+Billed amount: $980.00
+
+After review by our clinical team, the documentation provided does not support the
+necessity of the services rendered. You may submit additional records for reconsideration.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

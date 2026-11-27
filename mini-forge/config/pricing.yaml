@@ -1,0 +1,14 @@
+# USD per 1M tokens (input / output). Used by the gateway to compute cost per call.
+# Free-tier calls are still priced at list price so the reported cost is what it WOULD cost.
+# Check your provider's pricing page and edit if these are out of date.
+# A model not listed here falls back to `default` (deliberately pessimistic).
+models:
+  mock-triage-v1:              {input: 0.0,  output: 0.0}
+  claude-haiku-4-5:            {input: 1.0,  output: 5.0}
+  claude-sonnet-4-5:           {input: 3.0,  output: 15.0}
+  us.anthropic.claude-haiku-4-5-20251001-v1:0: {input: 1.0, output: 5.0}
+  gemini-2.5-flash:            {input: 0.30, output: 2.50}
+  gemini-2.5-flash-lite:       {input: 0.10, output: 0.40}
+  llama-3.3-70b-versatile:     {input: 0.59, output: 0.79}
+  gpt-4o-mini:                 {input: 0.15, output: 0.60}
+default: {input: 3.0, output: 15.0}

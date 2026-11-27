@@ -1,0 +1,9 @@
+PyYAML>=6.0
+python-dotenv>=1.0
+anthropic[bedrock]>=0.40
+openai>=1.40
+pytest>=8.0
+# optional bonus: upload API
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9

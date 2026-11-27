@@ -1,0 +1,17 @@
+Lakeside Medicaid Program
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-12
+
+Patient: Test Patient Kilo
+Date of birth: 1982-03-12
+Member ID: TEST-MBR-0011
+Claim number: TEST-CLM-2611
+Date of service: 2026-09-22
+Billed amount: $###
+
+Th# cl@im w%s d3n... [page scan unreadable] ...r3as0n c0d3 ### ... pl3ase s33 att@ched ...
+### ### ###
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

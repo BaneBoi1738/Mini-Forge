@@ -1,0 +1,17 @@
+Summit Medicare Advantage
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-05
+
+Patient: Test Patient Delta
+Date of birth: 1968-05-14
+Member ID: TEST-MBR-0004
+Claim number: TEST-CLM-2604
+Date of service: 2026-08-03
+Billed amount: $2,300.00
+Claim adjustment reason code: 50
+
+These services are denied as not medically necessary based on the information submitted.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

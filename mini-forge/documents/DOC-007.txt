@@ -1,0 +1,18 @@
+Lakeside Medicaid Program
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-08
+
+Patient: Test Patient Golf
+Date of birth: 1974-08-17
+Member ID: TEST-MBR-0007
+Claim number: TEST-CLM-2607
+Date of service: 2026-09-05
+Billed amount: $760.00
+Claim adjustment reason code: 27
+
+Expenses were incurred after the member's coverage terminated. Coverage under this plan
+ended on 2026-08-31.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

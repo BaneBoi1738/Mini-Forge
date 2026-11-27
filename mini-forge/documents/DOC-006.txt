@@ -1,0 +1,17 @@
+Crescent Care
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-07
+
+Patient: Test Patient Foxtrot
+Date of birth: 1972-07-16
+Member ID: TEST-MBR-0006
+Claim number: TEST-CLM-2606
+Date of service: 2026-08-20
+Billed amount: $310.00
+Claim adjustment reason code: 18
+
+This claim is an exact duplicate of a claim previously received and processed.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.

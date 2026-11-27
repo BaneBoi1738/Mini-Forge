@@ -1,0 +1,18 @@
+Riverbend Health
+Claims Department – Remittance & Denial Notice
+
+Notice date: 2026-10-09
+
+Patient: Test Patient Hotel
+Date of birth: 1976-09-18
+Member ID: TEST-MBR-0008
+Claim number: TEST-CLM-2608
+Date of service: 2026-08-28
+Billed amount: $2,150.00
+
+We were unable to locate an authorization number on file for this admission. Services of
+this type require approval before they are provided, so the claim cannot be paid as
+submitted.
+
+If you have questions, contact Provider Services at the number on your remittance advice.
+This is a fictional document created for a Neolytix take-home exercise.
