@@ -4,6 +4,7 @@
     python run.py --input documents/DOC-010.txt
     python run.py --input documents/ --agent some_other_agent   # refused: not in catalogue
 """
+from __future__ import annotations
 import argparse
 import json
 import sys

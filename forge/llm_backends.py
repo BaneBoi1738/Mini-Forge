@@ -5,6 +5,7 @@ Internally we keep one message format (Anthropic-style content blocks):
   assistant: [{"type": "text", "text"}, {"type": "tool_use", "id", "name", "input"}]
 OpenAI-compatible providers are converted to/from that format here.
 """
+from __future__ import annotations
 import json
 import os
 import re

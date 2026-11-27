@@ -13,6 +13,7 @@ ToolExecutor.handle(), in this order:
 
 What goes back to the model is a short status. It never contains de-tokenized values.
 """
+from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field

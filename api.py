@@ -5,6 +5,7 @@ in the background through the exact same pipeline as run.py.
     curl -F "file=@documents/DOC-001.txt" http://localhost:8000/letters
     curl http://localhost:8000/letters/<correlation_id>     # grep it in logs/audit.jsonl too
 """
+from __future__ import annotations
 import json
 import re
 import uuid

@@ -9,6 +9,7 @@ letters overlaps heavily with the SOP wording ("authorization number on file",
 "documentation does not support"), and it is deterministic and explainable.
 A reason code in the query (e.g. "16", "CARC 197") gives the matching SOP a strong boost.
 """
+from __future__ import annotations
 import math
 import re
 from collections import Counter

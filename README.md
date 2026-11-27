@@ -17,7 +17,7 @@ The platform rules it enforces:
 
 ## 1. Run it on localhost
 
-Requires **Python 3.10+**.
+Requires **Python 3.9+** (tested on 3.9 and 3.12).
 
 ```bash
 git clone <this repo> && cd mini-forge

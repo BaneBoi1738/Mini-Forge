@@ -8,6 +8,7 @@ Prints: category / action / human-review accuracy, tool-sequence match, policy d
 total LLM cost, and the PHI leak count from scanning every logged model request
 (and the audit log) for every PHI value in labels.json. Exit code 1 if any leak.
 """
+from __future__ import annotations
 import argparse
 import json
 import sys

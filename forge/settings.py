@@ -1,4 +1,5 @@
 """Paths and environment settings in one place."""
+from __future__ import annotations
 import os
 from pathlib import Path
 

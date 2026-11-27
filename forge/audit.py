@@ -7,6 +7,7 @@ reconstructed with `grep <correlation_id> logs/audit.jsonl`.
 Callers must only pass tokenized text / field names / counts here, never raw PHI.
 eval.py scans this file for PHI values to prove that.
 """
+from __future__ import annotations
 import json
 from datetime import datetime, timezone
 

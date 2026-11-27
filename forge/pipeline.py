@@ -1,4 +1,5 @@
 """Process one letter end to end: tokenize -> (fail closed?) -> agent -> result record."""
+from __future__ import annotations
 import hashlib
 import uuid
 from pathlib import Path

@@ -1,4 +1,5 @@
 """Full batch in mock mode + the eval script, including a check that the leak scanner works."""
+from __future__ import annotations
 import json
 from pathlib import Path
 

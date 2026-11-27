@@ -1,4 +1,5 @@
 """Pre-approved agent catalogue. Anything not in config/agents.yaml cannot run."""
+from __future__ import annotations
 from dataclasses import dataclass
 
 import yaml

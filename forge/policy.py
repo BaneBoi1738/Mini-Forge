@@ -7,6 +7,7 @@ The context passed in is built by the runner from TRUSTED sources (the category 
 SOP the agent actually retrieved, the billed amount parsed by code from the letter),
 not from free text the model wrote.
 """
+from __future__ import annotations
 from dataclasses import dataclass, field
 
 import yaml

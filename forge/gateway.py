@@ -10,6 +10,7 @@ Every model call in Mini-Forge goes through ModelGateway.chat(), which:
   3. logs model, tokens, cost, latency and correlation ID to the audit log, and the
      full (tokenized) request/response to logs/model_calls.jsonl for the leak scan.
 """
+from __future__ import annotations
 import json
 import sys
 import time

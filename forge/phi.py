@@ -14,6 +14,7 @@ Design choice: over-redaction is acceptable, under-redaction is not. All dates a
 tokenized (HIPAA treats dates tied to a person as identifiers) - the model doesn't need
 them to triage a denial. Billed amounts and reason codes are NOT PHI and are kept.
 """
+from __future__ import annotations
 import os
 import re
 import secrets

@@ -2,6 +2,7 @@
 
     python revoke.py --document DOC-004
 """
+from __future__ import annotations
 import argparse
 import sys
 

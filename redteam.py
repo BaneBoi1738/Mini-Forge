@@ -5,6 +5,7 @@ through the SAME executor / gateway / tokenizer the runner uses, and show each i
 
 Everything is audited under a run_id starting with "redteam-" (eval.py ignores it).
 """
+from __future__ import annotations
 import uuid
 from pathlib import Path
 

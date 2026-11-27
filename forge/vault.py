@@ -3,6 +3,7 @@
 token -> real value mapping lives ONLY here. Rows are scoped to a correlation_id
 (one letter in one run), so revoking consent for a letter = deleting its rows.
 """
+from __future__ import annotations
 import sqlite3
 from contextlib import closing
 

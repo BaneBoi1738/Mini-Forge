@@ -4,6 +4,7 @@ The model only ever sees: the system prompt, the TOKENIZED letter, tool schemas 
 catalogue allows, and short tool results. It ends the run by calling a terminal tool
 (route_to_work_queue or flag_for_human_review).
 """
+from __future__ import annotations
 import json
 
 from forge.gateway import ModelGateway
