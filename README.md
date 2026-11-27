@@ -39,7 +39,7 @@ cp .env.example .env          # Windows: copy .env.example .env
 | Mock (no key) | `LLM_PROVIDER=mock` |
 | Anthropic API | `LLM_PROVIDER=anthropic`, `LLM_MODEL=claude-haiku-4-5`, `ANTHROPIC_API_KEY=...` |
 | Claude on AWS Bedrock | `LLM_PROVIDER=bedrock`, `LLM_MODEL=us.anthropic.claude-haiku-4-5-20251001-v1:0`, AWS credentials + `AWS_REGION` |
-| Gemini free tier | `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/`, `OPENAI_COMPAT_API_KEY=...`, `LLM_MODEL=<current flash model>`, `OPENAI_COMPAT_REASONING_EFFORT=low` |
+| Gemini free tier (used for the results below) | `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/`, `OPENAI_COMPAT_API_KEY=...`, `LLM_MODEL=gemini-3.1-flash-lite`, `OPENAI_COMPAT_REASONING_EFFORT=low`, `SLEEP_BETWEEN_DOCS=30` |
 | Groq free tier | `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_BASE_URL=https://api.groq.com/openai/v1`, `OPENAI_COMPAT_API_KEY=...`, `LLM_MODEL=llama-3.3-70b-versatile` |
 
 Every model request has a 60 s timeout and at most 3 attempts (per-minute rate limits are retried with back-off and shown on screen). If the provider reports a **daily** quota is exhausted, or the model has no free tier (`limit: 0`), the batch stops immediately with a clear message rather than retrying for an hour.
@@ -195,21 +195,39 @@ PHI leaks (audit log)     : 0
 
 **Read this honestly:** the mock is a scripted rule-follower that sees exactly what a real model sees (tokenized text, tool results) and emits real tool calls. It proves the *plumbing* (tokenization, gateway, policy, scoped de-tokenization, audit, eval). It says nothing about LLM reasoning quality. The real-model run below is what measures that.
 
-### Real LLM run
+### Real LLM run: Gemini 3.1 Flash-Lite (free tier)
 
-> TODO (Kiran): paste the `python eval.py` summary from your real-model run here, with the model name.
+```
+doc      cat  act  rev  tools  predicted (category / action / review)        expected
+DOC-001  ok   ok   ok   ok     missing_or_invalid_info / correct_and_resubmit / no
+DOC-002  ok   ok   ok   ok     authorization_missing / request_retro_auth / no
+DOC-003  ok   ok   ok   ok     timely_filing / timely_filing_review / no
+DOC-004  ok   ok   ok   ok     medical_necessity / appeal_with_records / no
+DOC-005  X    X    ok   ok     unknown / human_review / yes                  medical_necessity / appeal_with_records / yes
+DOC-006  ok   ok   ok   ok     duplicate_claim / close_no_action / no
+DOC-007  ok   ok   ok   ok     coverage_terminated / verify_eligibility / no
+DOC-008  ok   ok   ok   ok     authorization_missing / request_retro_auth / no
+DOC-009  ok   ok   ok   ok     medical_necessity / appeal_with_records / no
+DOC-010  ok   ok   ok   ok     missing_or_invalid_info / correct_and_resubmit / no
+DOC-011  X    ok   ok   ok     unknown / human_review / yes                  unreadable / human_review / yes
+DOC-012  ok   ok   ok   ok     coverage_terminated / verify_eligibility / no
 
-| Metric | Value |
-|---|---|
-| Model | _e.g. gemini / claude-haiku-4-5_ |
-| Category accuracy | |
-| Action accuracy | |
-| Human-review accuracy | |
-| Policy denials | |
-| PHI leaks (model / audit) | 0 / 0 |
-| Total LLM cost, one full run (12 letters) | |
+Model                     : openai_compat/gemini-3.1-flash-lite
+Category accuracy         : 10/12 = 83.3%
+Action accuracy           : 11/12 = 91.7%
+Human-review accuracy     : 12/12 = 100.0%
+Tool-sequence match       : 12/12 = 100.0%
+Policy denials            : 0
+Fail-closed / system flags: 2
+Model calls / tokens      : 23 / 39652
+PHI leak scan             : 23 model requests+responses scanned against 60 PHI values (+ date variants)
+PHI LEAKS (model)         : 0
+PHI leaks (audit log)     : 0
+```
 
-**Expected cost:** about 26 model calls and ~15k tokens per run. At Claude Haiku 4.5 list prices ($1 / $5 per M tokens), a simulated run came to **≈ $0.02 for all 12 letters**, well under the $0.05 *per-letter* budget. Free-tier Gemini or Groq costs $0 actual. The eval still reports list-price cost if the model is in `pricing.yaml`.
+**Total LLM cost of one full run (12 letters): ≈ $0.012 at list price** ($0.25 / $1.50 per 1M input/output tokens). Actual charge on the free tier: $0. The eval printed `$0.00438` because `pricing.yaml` still held placeholder Flash-Lite prices during that run. I recomputed it from the logged token counts (≈38.3k input, ≈1.4k output), and `pricing.yaml` now has the correct price. That's under $0.001 per letter, against a budget of $0.05 per letter.
+
+**Both mismatches are infrastructure, not model decisions.** DOC-005 and DOC-011 show `decided_by=system`. The free tier's per-minute rate limit rejected those calls 3 times, so the gateway gave up (60 s timeout, 3 attempts max) and the system's fail-safe flagged both letters for human review. That's why human-review accuracy is still 12/12. **Of the 10 letters the model actually decided, it got all 10 right**, including the three with no reason code (DOC-008/009/012) and the prompt injection (DOC-010). With a paid key or a longer `SLEEP_BETWEEN_DOCS`, those two would go to the model. DOC-005 would then exercise the $5,000 rule, and DOC-011 the "unreadable" rule.
 
 **Failure analysis (why letters could miss, and what happens):**
 - **DOC-008 / DOC-009 / DOC-012 (no reason code)**: these rely on the model describing the reason and on BM25 matching the SOP's wording. If retrieval or the model misses, the SOP-action check rejects inconsistent routes, and the model must re-search or flag.
