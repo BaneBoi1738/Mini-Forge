@@ -256,18 +256,17 @@ PHI leaks (audit log)     : 0
 
 ## 7. AI usage
 
-> TODO (Kiran): fill in the bracketed parts. Be accurate; this section is scored.
-
 **Tools used**
 - **Claude (claude.ai, Claude Opus 5.5 with code execution)** was the main build partner. It read the assignment and data pack, proposed the architecture, wrote the first version of every module, and ran tests and the pipeline in a sandbox.
-- [Add any others you used, e.g. ChatGPT / Copilot / Cursor, and for what]
+- **VS Code (with the Claude Code extension)**: running, editing and debugging locally on Windows.
+- **Google AI Studio**: Gemini API key for the real-model evaluation.
 
-**What I did vs. what the AI did.** [Describe: e.g. reviewed every module, re-ran everything locally, ran the real-LLM evaluation, tested new letter formats, made decisions X/Y, rewrote Z.]
+**What I did vs. what the AI did.** Claude wrote the first version of every module, the tests and the README in a sandbox, using the mock model. I set it up and ran it on my own machine (Windows, VS Code) and ran the real-model evaluation on Gemini's free tier. I worked through the problems that only show up for real: a retired model returning 404, a free-tier quota that made the run hang, a broken virtualenv, and a GitHub web upload that lost the commit history and dotfiles. For each one I reported the symptom with screenshots and had Claude fix the code or the repo. I reviewed the outputs, the audit trail and the eval before submitting.
 
 **Key prompts**
 1. Kick-off: I gave Claude the full assignment brief and the data-pack zip, and asked it to build the complete Mini-Forge solution end to end (runner, tokenizer and vault, gateway, policy, agent, eval, README) within the 48-hour window, committing in stages so the history shows how it was built.
-2. [Your follow-up prompt, e.g. asking it to stress-test the tokenizer against letter formats not in the data pack]
-3. [Another, e.g. asking it to explain the policy check / budget enforcement line by line]
+2. After the first real Gemini run sat silent for about an hour: *"bro it's been an hour, it's stuck"*. This led to the timeout / bounded-retry / quota-stop fix (item 9 below).
+3. After uploading through GitHub's web UI: *"check github"* then *"fix it"*. Claude found the lost history, nested folder, committed zip and missing `.env.example`, and restored the real history with a merge instead of a force-push.
 
 **What the AI got wrong, and how it was fixed** (all of these came up during the build and are visible in the commit history):
 1. **A labelled value swallowed the rest of its sentence.** `Dates of Service: 09/01/2026. Ms. Lopez was admitted…` became one token, hiding the sentence from the model. Fixed with `_trim_value()`, which ends a labelled value at a sentence break.
@@ -280,9 +279,10 @@ PHI leaks (audit log)     : 0
 8. A unit test assumed exactly one `patient_name` value per letter. NER legitimately adds a partial-name match, so the test now checks the primary token.
 9. **Real-model run hung for about an hour on the Gemini free tier.** The OpenAI SDK's own hidden retries stacked on top of the gateway's 5 retries, with no request timeout, and a daily-quota 429 was treated as "wait and retry". Fixed: SDK retries are off (the gateway owns retry policy), there's a 60 s timeout per request, at most 3 attempts, per-day / `limit: 0` quota errors stop the batch immediately, and progress and retries are printed so a run never looks frozen.
 10. **Model name 404.** `gemini-2.5-flash` was still listed by the models endpoint but returned 404 on use. I switched to a current Flash model and added its price to `pricing.yaml`.
-11. [Anything else you found when running it yourself with a real model]
+11. **Key pasted into the wrong file.** I first put the Gemini key into `.env.example` through GitHub's web editor. GitHub push protection blocked it. I cancelled, rotated the key, and kept it only in the local, git-ignored `.env`. Lesson: secrets live only in `.env`, never in tracked files.
+12. **A second virtualenv** (`.venv-1`) appeared, and packages went into the wrong one. `.gitignore` now ignores `.venv*/`.
 
-**Total time spent:** [X hours]
+**Total time spent:** about 6 hours. Roughly 1.5 h on day 1 (brief, kick-off, reviewing the build) and roughly 4.5 h on day 2 (local setup, real-model runs and debugging, GitHub, review, recording).
 
 ---
 
