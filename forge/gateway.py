@@ -11,6 +11,7 @@ Every model call in Mini-Forge goes through ModelGateway.chat(), which:
      full (tokenized) request/response to logs/model_calls.jsonl for the leak scan.
 """
 import json
+import sys
 import time
 
 import yaml
@@ -19,7 +20,7 @@ from forge import settings
 from forge.audit import append_jsonl, audit, now_iso
 from forge.catalogue import AgentSpec
 from forge.llm_backends import (AnthropicBackend, LLMResponse, MockBackend,
-                                OpenAICompatBackend, RetryableError)
+                                OpenAICompatBackend, QuotaExhausted, RetryableError)
 
 
 class BudgetExceeded(Exception):
@@ -99,19 +100,26 @@ class ModelGateway:
             audit("phi_guard_block", **self._ids(), step=self.steps, matches=hits)
             raise PHIBlocked(f"{hits} vault value(s) found in outgoing model request")
 
-        # --- 3. call with retry on rate limits -------------------------------------------
+        # --- 3. call with bounded retry on rate limits / timeouts -------------------------
+        # Worst case per call: 3 attempts x 60 s timeout + 10 + 20 s back-off. Never hangs.
         t0 = time.time()
-        for attempt in range(5):
+        for attempt in range(3):
             try:
                 resp = self.backend.complete(system, messages, tools, max_out)
                 break
+            except QuotaExhausted as e:
+                audit("model_quota_exhausted", **self._ids(), error=str(e)[:300])
+                raise
             except RetryableError as e:
-                wait = min(60, 5 * 2 ** attempt)
+                wait = 10 * 2 ** attempt
                 audit("model_retry", **self._ids(), attempt=attempt + 1, wait_s=wait,
                       error=str(e)[:200])
-                time.sleep(wait)
+                if attempt < 2:
+                    print(f"   [{self.document_id}] model busy/rate-limited, retry {attempt + 1}/2 "
+                          f"in {wait}s: {str(e)[:120]}", file=sys.stderr, flush=True)
+                    time.sleep(wait)
         else:
-            raise RuntimeError("model call failed after retries")
+            raise RuntimeError("model call failed after 3 attempts (rate limit / timeout)")
         latency_ms = int((time.time() - t0) * 1000)
 
         self.steps += 1

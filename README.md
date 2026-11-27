@@ -42,6 +42,8 @@ cp .env.example .env          # Windows: copy .env.example .env
 | Gemini free tier | `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/`, `OPENAI_COMPAT_API_KEY=...`, `LLM_MODEL=<current flash model>`, `OPENAI_COMPAT_REASONING_EFFORT=low` |
 | Groq free tier | `LLM_PROVIDER=openai_compat`, `OPENAI_COMPAT_BASE_URL=https://api.groq.com/openai/v1`, `OPENAI_COMPAT_API_KEY=...`, `LLM_MODEL=llama-3.3-70b-versatile` |
 
+Every model request has a 60 s timeout and at most 3 attempts (per-minute rate limits are retried with back-off and shown on screen). If the provider reports a **daily** quota is exhausted, or the model has no free tier (`limit: 0`), the batch stops immediately with a clear message rather than retrying for an hour.
+
 If the model you use isn't in `config/pricing.yaml`, add its price per 1M tokens. Otherwise cost is reported at a deliberately pessimistic default. On free tiers, set `SLEEP_BETWEEN_DOCS=5` if you hit rate limits (the gateway also retries 429s with backoff).
 
 **Run:**
@@ -50,7 +52,7 @@ If the model you use isn't in `config/pricing.yaml`, add its price per 1M tokens
 python run.py --input documents/          # batch: all 12 letters, unattended
 python eval.py                            # accuracy, denials, cost, PHI leak scan
 python redteam.py                         # fire 9 attacks at the guardrails, all must be blocked
-python -m pytest -q                       # 49 tests
+python -m pytest -q                       # 52 tests
 
 # bonus
 python revoke.py --document DOC-004       # consent revocation: destroy vault rows, prove tokens dead
@@ -258,7 +260,9 @@ PHI leaks (audit log)     : 0
 6. **The upload API returned a job ID** instead of the correlation ID the brief asks for. The pipeline now accepts a pre-assigned correlation ID.
 7. **The OpenAI-compatible adapter dropped Gemini "thought signatures"** on tool calls. Newer Gemini models need these echoed back on the next turn, or multi-turn tool calling fails. They're now preserved and re-sent.
 8. A unit test assumed exactly one `patient_name` value per letter. NER legitimately adds a partial-name match, so the test now checks the primary token.
-9. [Anything you found when running it yourself with a real model]
+9. **Real-model run hung for about an hour on the Gemini free tier.** The OpenAI SDK's own hidden retries stacked on top of the gateway's 5 retries, with no request timeout, and a daily-quota 429 was treated as "wait and retry". Fixed: SDK retries are off (the gateway owns retry policy), there's a 60 s timeout per request, at most 3 attempts, per-day / `limit: 0` quota errors stop the batch immediately, and progress and retries are printed so a run never looks frozen.
+10. **Model name 404.** `gemini-2.5-flash` was still listed by the models endpoint but returned 404 on use. I switched to a current Flash model and added its price to `pricing.yaml`.
+11. [Anything else you found when running it yourself with a real model]
 
 **Total time spent:** [X hours]
 
@@ -272,5 +276,5 @@ forge/  phi.py vault.py gateway.py llm_backends.py catalogue.py policy.py
         sop_index.py tools.py agent.py pipeline.py audit.py settings.py
 config/ agents.yaml policies.yaml pricing.yaml
 documents/  sops/  labels.json      (data pack, unchanged)
-tests/      49 tests
+tests/      52 tests
 ```

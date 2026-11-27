@@ -8,6 +8,7 @@ from forge.agent import run_agent
 from forge.audit import audit
 from forge.catalogue import AgentSpec
 from forge.gateway import BudgetExceeded, ModelGateway, PHIBlocked
+from forge.llm_backends import QuotaExhausted
 from forge.phi import tokenize
 from forge.policy import PolicyEngine
 from forge.sop_index import SOPIndex
@@ -46,6 +47,7 @@ def process_document(path: Path, *, run_id: str, agent: AgentSpec, policy: Polic
 
     gateway = None
     status = "completed"
+    stop_reason = None
     if not tok.safe:
         # 2a. FAIL CLOSED: PHI may remain -> no model call at all
         status = "fail_closed_phi"
@@ -60,14 +62,17 @@ def process_document(path: Path, *, run_id: str, agent: AgentSpec, policy: Polic
         try:
             run_agent(gateway, executor, document_id, tok.text)
         except BudgetExceeded as e:
-            status = "budget_exceeded"
+            status, stop_reason = "budget_exceeded", str(e)
             audit("run_stopped", **ids, reason=str(e))
         except PHIBlocked as e:
-            status = "fail_closed_phi_guard"
+            status, stop_reason = "fail_closed_phi_guard", str(e)
             audit("run_stopped", **ids, reason=str(e))
+        except QuotaExhausted as e:
+            status, stop_reason = "quota_exhausted", str(e)[:200]
+            audit("run_stopped", **ids, reason=f"provider quota exhausted: {str(e)[:200]}")
         except Exception as e:  # provider/API error: never leave a letter un-routed
-            status = "error"
-            audit("run_stopped", **ids, reason=f"{type(e).__name__}: {str(e)[:300]}")
+            status, stop_reason = "error", f"{type(e).__name__}: {str(e)[:300]}"
+            audit("run_stopped", **ids, reason=stop_reason)
         if not ctx.done:
             if status == "completed":
                 status = "no_terminal_action"
@@ -76,7 +81,7 @@ def process_document(path: Path, *, run_id: str, agent: AgentSpec, policy: Polic
     d = ctx.decision or {}
     result = {
         "document_id": document_id, "correlation_id": correlation_id, "run_id": run_id,
-        "status": status,
+        "status": status, "error": stop_reason,
         "category": d.get("category"), "action": d.get("action"),
         "human_review": d.get("human_review", True), "decided_by": d.get("actor"),
         "sop_reference": d.get("sop_reference"),

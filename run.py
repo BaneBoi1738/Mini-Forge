@@ -62,6 +62,7 @@ def main(argv=None) -> int:
     results_path.parent.mkdir(parents=True, exist_ok=True)
     results = []
     for i, f in enumerate(files):
+        print(f"   ... {f.stem} ({i + 1}/{len(files)})", file=sys.stderr, flush=True)
         if i and settings.SLEEP_BETWEEN_DOCS:
             time.sleep(settings.SLEEP_BETWEEN_DOCS)
         r = process_document(f, run_id=run_id, agent=agent, policy=policy, sops=sops, vault=vault,
@@ -72,6 +73,13 @@ def main(argv=None) -> int:
         print(f"{r['document_id']:<9}{r['status']:<17}{str(r['category']):<25}{str(r['action']):<22}"
               f"{'yes' if r['human_review'] else 'no':<7}{r['policy_denials']:<7}{r['model_steps']:<6}"
               f"{r['cost_usd']:>9.5f}  {' > '.join(r['tool_calls'])}")
+        if r.get("error"):
+            print(f"         reason: {r['error'][:150]}")
+        if r["status"] == "quota_exhausted":
+            print("\nProvider quota is used up - stopping the batch (the remaining letters would "
+                  "fail the same way).\nSwitch LLM_MODEL / provider in .env, or wait for the quota "
+                  "to reset, then re-run.", file=sys.stderr)
+            break
 
     total = sum(r["cost_usd"] for r in results)
     (Path(settings.RESULTS_DIR) / "LATEST").write_text(run_id)

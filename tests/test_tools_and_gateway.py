@@ -143,3 +143,40 @@ def test_openai_message_conversion():
     assert out[2]["tool_calls"][0]["function"]["name"] == "search_sop"
     assert out[3]["tool_call_id"] == "1"
     assert fns[0]["function"]["parameters"] == {"type": "object"}
+
+
+# ---- provider errors: bounded retries, quota stops fast ---------------------------
+from forge.llm_backends import QuotaExhausted, RetryableError, _classify
+
+
+def test_error_classification():
+    per_min = "429 RESOURCE_EXHAUSTED quotaId: GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+    per_day = "429 RESOURCE_EXHAUSTED quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+    no_tier = "429 Quota exceeded for metric generate_content_free_tier_requests, limit: 0"
+    assert isinstance(_classify(Exception(per_min)), RetryableError)
+    assert isinstance(_classify(Exception(per_day)), QuotaExhausted)
+    assert isinstance(_classify(Exception(no_tier)), QuotaExhausted)
+
+
+class FlakyBackend:
+    def __init__(self, exc):
+        self.exc, self.calls = exc, 0
+
+    def complete(self, *a):
+        self.calls += 1
+        raise self.exc
+
+
+def test_quota_exhausted_is_not_retried():
+    b = FlakyBackend(QuotaExhausted("per day"))
+    with pytest.raises(QuotaExhausted):
+        gateway(backend=b).chat("s", [{"role": "user", "content": "hi"}], [])
+    assert b.calls == 1
+
+
+def test_rate_limit_retries_are_bounded(monkeypatch):
+    monkeypatch.setattr("forge.gateway.time.sleep", lambda s: None)
+    b = FlakyBackend(RetryableError("429 per minute"))
+    with pytest.raises(RuntimeError):
+        gateway(backend=b).chat("s", [{"role": "user", "content": "hi"}], [])
+    assert b.calls == 3

@@ -41,14 +41,32 @@ class RetryableError(Exception):
     """Rate limit / transient server error - the gateway backs off and retries."""
 
 
+class QuotaExhausted(Exception):
+    """Provider says the quota is used up (e.g. free-tier requests per day). Retrying won't help."""
+
+
+# The SDKs' own hidden retries are switched off (max_retries=0) so the gateway owns retry
+# policy and logs every attempt; each request also has a hard timeout so nothing hangs.
+REQUEST_TIMEOUT_S = float(os.getenv("LLM_TIMEOUT_SECONDS", "60"))
+
+
+def _classify(e: Exception) -> Exception:
+    msg = str(e)
+    # Per-day quotas and "limit: 0" (model has no free tier) won't clear by waiting a minute.
+    if re.search(r"per\s*day|perday|limit:\s*0\b|insufficient_quota", msg, re.I):
+        return QuotaExhausted(msg[:300])
+    return RetryableError(msg[:300])
+
+
 # ---------------------------------------------------------------- Anthropic / Bedrock
 class AnthropicBackend:
     def __init__(self, model: str, bedrock: bool = False):
         import anthropic
         self._anthropic = anthropic
         self.model = model
-        self.client = (anthropic.AnthropicBedrock(aws_region=os.getenv("AWS_REGION", "us-east-1"))
-                       if bedrock else anthropic.Anthropic())
+        opts = dict(timeout=REQUEST_TIMEOUT_S, max_retries=0)
+        self.client = (anthropic.AnthropicBedrock(aws_region=os.getenv("AWS_REGION", "us-east-1"), **opts)
+                       if bedrock else anthropic.Anthropic(**opts))
 
     def complete(self, system, messages, tools, max_tokens) -> LLMResponse:
         try:
@@ -56,7 +74,7 @@ class AnthropicBackend:
                                             tools=tools, max_tokens=max_tokens, temperature=0)
         except (self._anthropic.RateLimitError, self._anthropic.InternalServerError,
                 self._anthropic.APIConnectionError) as e:
-            raise RetryableError(str(e)) from e
+            raise _classify(e) from e
         text = "".join(b.text for b in r.content if b.type == "text")
         calls = [ToolCall(b.id, b.name, dict(b.input)) for b in r.content if b.type == "tool_use"]
         return LLMResponse(text, calls, r.usage.input_tokens, r.usage.output_tokens, r.stop_reason)
@@ -71,7 +89,8 @@ class OpenAICompatBackend:
         self._openai = openai
         self.model = model
         self.client = openai.OpenAI(base_url=os.getenv("OPENAI_COMPAT_BASE_URL") or None,
-                                    api_key=os.getenv("OPENAI_COMPAT_API_KEY"))
+                                    api_key=os.getenv("OPENAI_COMPAT_API_KEY"),
+                                    timeout=REQUEST_TIMEOUT_S, max_retries=0)
 
     @staticmethod
     def to_openai(system, messages, tools):
@@ -111,7 +130,7 @@ class OpenAICompatBackend:
                                                     max_tokens=max_tokens, **extra)
         except (self._openai.RateLimitError, self._openai.InternalServerError,
                 self._openai.APIConnectionError) as e:
-            raise RetryableError(str(e)) from e
+            raise _classify(e) from e
         choice = r.choices[0]
         calls = []
         for i, tc in enumerate(choice.message.tool_calls or []):
